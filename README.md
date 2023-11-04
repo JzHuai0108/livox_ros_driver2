@@ -55,7 +55,8 @@ git clone https://github.com/Livox-SDK/livox_ros_driver2.git ws_livox/src/livox_
 #### For ROS (take Noetic as an example):
 ```shell
 source /opt/ros/noetic/setup.sh
-./build.sh ROS1
+./build.sh ROS1 <install_prefix_for_livox_sdk2>
+# eg $HOME/Documents/slam_devel
 ```
 
 #### For ROS2 Foxy:
@@ -83,6 +84,11 @@ in which,
 
 * **livox_ros_driver2** : is the ROS package name of Livox ROS Driver 2;
 * **[launch file]** : is the ROS launch file you want to use; the 'launch_ROS1' folder contains several launch samples for your reference;  
+
+To record data for mapping
+```
+roslaunch livox_ros_driver2 msg_MID360.launch rosbag_enable:=true output_bag:=/media/jhuai/docker/lidarslam/mid360_ws/data/909-3.bag
+```
 
 An rviz launch example for HAP LiDAR would be:
 

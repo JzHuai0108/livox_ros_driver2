@@ -10,6 +10,7 @@
 	<arg name="output_type" default="0"/>
 	<arg name="rviz_enable" default="true"/>
 	<arg name="rosbag_enable" default="false"/>
+	<arg name="output_bag" default="livox_test.bag"/>
 	<arg name="cmdline_arg" default="$(arg bd_list)"/>
 	<arg name="msg_frame_id" default="livox_frame"/>
 	<arg name="lidar_bag" default="true"/>
@@ -39,7 +40,7 @@
 
 	<group if="$(arg rosbag_enable)">
     	<node pkg="rosbag" type="record" name="record" output="screen"
-          		args="-a"/>
+          		args="record -O $(arg output_bag) /livox/imu /livox/lidar"/>
     </group>
 
 </launch>

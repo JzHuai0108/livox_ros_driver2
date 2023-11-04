@@ -149,6 +149,7 @@ if(ROS_EDITION STREQUAL "ROS1")
     ${catkin_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${APR_INCLUDE_DIRS}
+    /home/jhuai/Documents/slam_devel/include
     3rdparty
     src
   )
