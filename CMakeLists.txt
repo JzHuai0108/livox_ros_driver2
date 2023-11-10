@@ -56,7 +56,13 @@ if(ROS_EDITION STREQUAL "ROS1")
   )
 
   find_package(PkgConfig)
-  pkg_check_modules(APR apr-1)
+  if (ANDROID)
+    set(APR_FOUND 1)
+    set(APR_LIBRARIES apr-1)
+    set(APR_INCLUDE_DIRS ${CMAKE_PREFIX_PATH}/include/apr-1)
+  else()
+    pkg_check_modules(APR apr-1)
+  endif()
   if (APR_FOUND)
     message(${APR_INCLUDE_DIRS})
     message(${APR_LIBRARIES})
@@ -149,7 +155,6 @@ if(ROS_EDITION STREQUAL "ROS1")
     ${catkin_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${APR_INCLUDE_DIRS}
-    /home/jhuai/Documents/slam_devel/include
     3rdparty
     src
   )
