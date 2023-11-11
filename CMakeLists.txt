@@ -67,7 +67,7 @@ if(ROS_EDITION STREQUAL "ROS1")
     message(${APR_INCLUDE_DIRS})
     message(${APR_LIBRARIES})
   endif (APR_FOUND)
-
+  set(LIVOX_SDK_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include)
   ###################################
   ## catkin specific configuration ##
   ###################################
@@ -98,6 +98,7 @@ if(ROS_EDITION STREQUAL "ROS1")
 
   ## make sure the livox_lidar_sdk_static library is installed
   find_library(LIVOX_LIDAR_SDK_LIBRARY  liblivox_lidar_sdk_static.a    /usr/local/lib)
+  #  find_library(LIVOX_LIDAR_SDK_LIBRARY  liblivox_lidar_sdk_shared.so    /usr/local/lib)
 
   ## PCL library
   link_directories(${PCL_LIBRARY_DIRS})
@@ -106,32 +107,31 @@ if(ROS_EDITION STREQUAL "ROS1")
   #---------------------------------------------------------------------------------------
   # generate excutable and add libraries
   #---------------------------------------------------------------------------------------
-  add_executable(${PROJECT_NAME}_node
+  # Change STATIC to SHARED if liblivox_lidar_sdk_shared.so is to be used.
+  add_library(${PROJECT_NAME} STATIC
     ""
   )
-
   #---------------------------------------------------------------------------------------
   # precompile macro and compile option
   #---------------------------------------------------------------------------------------
-  target_compile_options(${PROJECT_NAME}_node
+  target_compile_options(${PROJECT_NAME}
     PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wall>
   )
 
   #---------------------------------------------------------------------------------------
   # add projects that depend on
   #---------------------------------------------------------------------------------------
-  add_dependencies(${PROJECT_NAME}_node ${PROJECT_NAME}_generate_messages_cpp)
+  add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages_cpp)
 
   #---------------------------------------------------------------------------------------
   # source file
   #---------------------------------------------------------------------------------------
-  target_sources(${PROJECT_NAME}_node
+  target_sources(${PROJECT_NAME}
     PRIVATE
     src/driver_node.cpp
     src/lds.cpp
     src/lds_lidar.cpp
     src/lddc.cpp
-    src/livox_ros_driver2.cpp
 
     src/comm/comm.cpp
     src/comm/ldq.cpp
@@ -150,11 +150,12 @@ if(ROS_EDITION STREQUAL "ROS1")
   #---------------------------------------------------------------------------------------
   # include file
   #---------------------------------------------------------------------------------------
-  target_include_directories(${PROJECT_NAME}_node
+  target_include_directories(${PROJECT_NAME}
     PUBLIC
     ${catkin_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
     ${APR_INCLUDE_DIRS}
+    ${LIVOX_SDK_INCLUDE_DIRS}
     3rdparty
     src
   )
@@ -162,7 +163,7 @@ if(ROS_EDITION STREQUAL "ROS1")
   #---------------------------------------------------------------------------------------
   # link libraries
   #---------------------------------------------------------------------------------------
-  target_link_libraries(${PROJECT_NAME}_node
+  target_link_libraries(${PROJECT_NAME}
     ${LIVOX_LIDAR_SDK_LIBRARY}
     ${Boost_LIBRARY}
     ${catkin_LIBRARIES}
@@ -170,12 +171,19 @@ if(ROS_EDITION STREQUAL "ROS1")
     ${APR_LIBRARIES}
   )
 
+  add_executable(${PROJECT_NAME}_node
+    src/livox_ros_driver2.cpp
+  )
+  target_link_libraries(${PROJECT_NAME}_node
+    ${PROJECT_NAME})
 
   #---------------------------------------------------------------------------------------
   # Install
   #---------------------------------------------------------------------------------------
 
-  install(TARGETS ${PROJECT_NAME}_node
+  install(TARGETS 
+    ${PROJECT_NAME}
+    ${PROJECT_NAME}_node
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
