@@ -4,6 +4,11 @@ readonly VERSION_ROS1="ROS1"
 readonly VERSION_ROS2="ROS2"
 readonly VERSION_HUMBLE="humble"
 
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 [ROS1|ROS2|humble] [Livox-SDK2 install prefix]"
+    exit
+fi
+
 pushd `pwd` > /dev/null
 cd `dirname $0`
 echo "Working Path: "`pwd`
@@ -55,7 +60,7 @@ fi
 pushd `pwd` > /dev/null
 if [ $ROS_VERSION = ${VERSION_ROS1} ]; then
     cd ../../
-    catkin build -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX=$2
+    catkin build -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX=$2 -DPYTHON_EXECUTABLE=/usr/bin/python3
 elif [ $ROS_VERSION = ${VERSION_ROS2} ]; then
     cd ../../
     colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DHUMBLE_ROS=${ROS_HUMBLE}
