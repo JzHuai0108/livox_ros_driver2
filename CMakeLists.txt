@@ -157,7 +157,7 @@ if(ROS_EDITION STREQUAL "ROS1")
     ${APR_INCLUDE_DIRS}
     ${LIVOX_SDK_INCLUDE_DIRS}
     3rdparty
-    src
+    include
   )
 
   #---------------------------------------------------------------------------------------
@@ -192,6 +192,9 @@ if(ROS_EDITION STREQUAL "ROS1")
   install(DIRECTORY launch_ROS1/
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch_ROS1
   )
+
+  install(DIRECTORY include/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
   #---------------------------------------------------------------------------------------
   # end of CMakeList.txt

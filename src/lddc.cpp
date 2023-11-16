@@ -32,7 +32,7 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "include/ros_headers.h"
+#include "ros_headers.h"
 
 #include "driver_node.h"
 #include "lds_lidar.h"

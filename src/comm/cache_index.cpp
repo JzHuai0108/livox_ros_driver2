@@ -22,7 +22,7 @@
 // SOFTWARE.
 //
 
-#include "cache_index.h"
+#include "comm/cache_index.h"
 #include "livox_lidar_def.h"
 
 namespace livox_ros {
