@@ -311,7 +311,7 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
   }
 
   #ifdef BUILDING_ROS1
-      cloud.header.stamp = ros::Time( timestamp / 1000000000.0);
+      cloud.header.stamp = ros::Time( timestamp / 1000000000, timestamp % 1000000000);
   #elif defined BUILDING_ROS2
       cloud.header.stamp = rclcpp::Time(timestamp);
   #endif
@@ -325,7 +325,7 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
     point.reflectivity = pkg.points[i].intensity;
     point.tag = pkg.points[i].tag;
     point.line = pkg.points[i].line;
-    point.timestamp = static_cast<double>(pkg.points[i].offset_time);
+    point.timestamp = static_cast<double>(pkg.points[i].offset_time - pkg.base_time);
     points.push_back(std::move(point));
   }
   cloud.data.resize(pkg.points_num * sizeof(LivoxPointXyzrtlt));
@@ -367,7 +367,7 @@ void Lddc::InitCustomMsg(CustomMsg& livox_msg, const StoragePacket& pkg, uint8_t
   livox_msg.timebase = timestamp;
 
 #ifdef BUILDING_ROS1
-  livox_msg.header.stamp = ros::Time(timestamp / 1000000000.0);
+  livox_msg.header.stamp = ros::Time(timestamp / 1000000000, timestamp % 1000000000);
 #elif defined BUILDING_ROS2
   livox_msg.header.stamp = rclcpp::Time(timestamp);
 #endif
