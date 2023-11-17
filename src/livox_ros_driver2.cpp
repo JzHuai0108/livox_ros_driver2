@@ -29,10 +29,9 @@
 #include <thread>
 
 #include "livox_ros_driver2.h"
-#include "ros_headers.h"
 #include "driver_node.h"
-#include "lddc.h"
-#include "lds_lidar.h"
+#include "lddc_top.h"
+#include "comm/comm.h"
 
 using namespace livox_ros;
 
@@ -54,8 +53,8 @@ int main(int argc, char **argv) {
   int xfer_format = kPointCloud2Msg;
   int multi_topic = 0;
   int data_src = kSourceRawLidar;
-  double publish_freq  = 10.0; /* Hz */
   int output_type      = kOutputToRos;
+  double publish_freq  = 10.0; /* Hz */
   std::string frame_id = "livox_frame";
   bool lidar_bag = true;
   bool imu_bag   = false;
@@ -79,13 +78,11 @@ int main(int argc, char **argv) {
     publish_freq = publish_freq;
   }
 
-  livox_node.future_ = livox_node.exit_signal_.get_future();
+  livox_node.setFuture();
 
-  /** Lidar data distribute control and lidar data source set */
-  livox_node.lddc_ptr_ = std::make_unique<Lddc>(xfer_format, multi_topic, data_src, output_type,
+  livox_node.setLddc(xfer_format, multi_topic, data_src, output_type,
                         publish_freq, frame_id, lidar_bag, imu_bag);
-  livox_node.lddc_ptr_->SetRosNode(&livox_node);
-
+ 
   if (data_src == kSourceRawLidar) {
     DRIVER_INFO(livox_node, "Data Source is raw lidar.");
 
@@ -93,14 +90,7 @@ int main(int argc, char **argv) {
     livox_node.getParam("user_config_path", user_config_path);
     DRIVER_INFO(livox_node, "Config file : %s", user_config_path.c_str());
 
-    LdsLidar *read_lidar = LdsLidar::GetInstance(publish_freq);
-    livox_node.lddc_ptr_->RegisterLds(static_cast<Lds *>(read_lidar));
-
-    if ((read_lidar->InitLdsLidar(user_config_path))) {
-      DRIVER_INFO(livox_node, "Init lds lidar successfully!");
-    } else {
-      DRIVER_ERROR(livox_node, "Init lds lidar failed!");
-    }
+    livox_node.registerLds(publish_freq, user_config_path);
   } else {
     DRIVER_ERROR(livox_node, "Invalid data src (%d), please check the launch file", data_src);
   }
@@ -191,29 +181,6 @@ DriverNode::DriverNode(const rclcpp::NodeOptions & node_options)
 RCLCPP_COMPONENTS_REGISTER_NODE(livox_ros::DriverNode)
 
 #endif  // defined BUILDING_ROS2
-
-
-void DriverNode::PointCloudDataPollThread()
-{
-  std::future_status status;
-  std::this_thread::sleep_for(std::chrono::seconds(3));
-  do {
-    lddc_ptr_->DistributePointCloudData();
-    status = future_.wait_for(std::chrono::microseconds(0));
-  } while (status == std::future_status::timeout);
-}
-
-void DriverNode::ImuDataPollThread()
-{
-  std::future_status status;
-  std::this_thread::sleep_for(std::chrono::seconds(3));
-  do {
-    lddc_ptr_->DistributeImuData();
-    status = future_.wait_for(std::chrono::microseconds(0));
-  } while (status == std::future_status::timeout);
-}
-
-
 
 
 

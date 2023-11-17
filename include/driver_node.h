@@ -43,8 +43,12 @@ class DriverNode final : public ros::NodeHandle {
 
   void PointCloudDataPollThread();
   void ImuDataPollThread();
+  void setFuture();
+  void setLddc(int xfer_format, int multi_topic, int data_src, int output_type,
+      double publish_freq, std::string frame_id, bool lidar_bag, bool imu_bag);
+  void registerLds(double publish_freq, const std::string &user_config_path);
 
-  std::unique_ptr<Lddc> lddc_ptr_;
+  std::shared_ptr<Lddc> lddc_ptr_;
   std::shared_ptr<std::thread> pointclouddata_poll_thread_;
   std::shared_ptr<std::thread> imudata_poll_thread_;
   std::shared_future<void> future_;

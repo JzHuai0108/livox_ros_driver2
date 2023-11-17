@@ -27,43 +27,12 @@
 
 #include "livox_ros_driver2.h"
 
-#include "driver_node.h"
+// #include "driver_node.h"
 #include "lds.h"
+#include "lddc_top.h"
+#include <pcl_ros/point_cloud.h>
 
 namespace livox_ros {
-
-/** Send pointcloud message Data to ros subscriber or save them in rosbag file */
-typedef enum {
-  kOutputToRos = 0,
-  kOutputToRosBagFile = 1,
-} DestinationOfMessageOutput;
-
-/** The message type of transfer */
-typedef enum {
-  kPointCloud2Msg = 0,
-  kLivoxCustomMsg = 1,
-  kPclPxyziMsg = 2,
-  kLivoxImuMsg = 3,
-} TransferType;
-
-/** Type-Definitions based on ROS versions */
-#ifdef BUILDING_ROS1
-using Publisher = ros::Publisher;
-using PublisherPtr = ros::Publisher*;
-using PointCloud2 = sensor_msgs::PointCloud2;
-using PointField = sensor_msgs::PointField;
-using CustomMsg = livox_ros_driver2::CustomMsg;
-using CustomPoint = livox_ros_driver2::CustomPoint;
-using ImuMsg = sensor_msgs::Imu;
-#elif defined BUILDING_ROS2
-template <typename MessageT> using Publisher = rclcpp::Publisher<MessageT>;
-using PublisherPtr = std::shared_ptr<rclcpp::PublisherBase>;
-using PointCloud2 = sensor_msgs::msg::PointCloud2;
-using PointField = sensor_msgs::msg::PointField;
-using CustomMsg = livox_ros_driver2::msg::CustomMsg;
-using CustomPoint = livox_ros_driver2::msg::CustomPoint;
-using ImuMsg = sensor_msgs::msg::Imu;
-#endif
 
 using PointCloud = pcl::PointCloud<pcl::PointXYZI>;
 
