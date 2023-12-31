@@ -177,6 +177,8 @@ if(ROS_EDITION STREQUAL "ROS1")
   target_link_libraries(${PROJECT_NAME}_node
     ${PROJECT_NAME})
 
+  add_executable(test_time src/test_time.cpp)
+
   #---------------------------------------------------------------------------------------
   # Install
   #---------------------------------------------------------------------------------------

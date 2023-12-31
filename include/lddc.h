@@ -64,6 +64,7 @@ class Lddc final {
 
  public:
   Lds *lds_;
+  const uint64_t ksec2nano = 1000000000;
 
  private:
   void PollingLidarPointCloudData(uint8_t index, LidarDevice *lidar);
