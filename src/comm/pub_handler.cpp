@@ -193,8 +193,8 @@ void PubHandler::CheckTimer(uint32_t id) {
       frame_.lidar_num = 0;
     }
   } else { // Disable time synchronization
-    // auto now_time = std::chrono::high_resolution_clock::now();
-    auto now_time = std::chrono::system_clock::now();
+    auto now_time = std::chrono::high_resolution_clock::now();
+    // auto now_time = std::chrono::system_clock::now();
     //First Set
     static bool first = true;
     if (first) {
@@ -205,7 +205,7 @@ void PubHandler::CheckTimer(uint32_t id) {
     if (now_time - last_pub_time_ < std::chrono::nanoseconds(publish_interval_)) {
       return;
     }
-    last_pub_time_ += std::chrono::microseconds(publish_interval_ / 1000);
+    last_pub_time_ += std::chrono::nanoseconds(publish_interval_);
     for (auto &process_handler : lidar_process_handlers_) {
       frame_.base_time[frame_.lidar_num] = process_handler.second->GetLidarBaseTime();
       uint32_t handle = process_handler.first;
@@ -272,9 +272,9 @@ uint64_t PubHandler::GetEthPacketTimestamp(uint8_t timestamp_type, uint8_t* time
     return time.stamp;
   }
 
-  // return std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-  // Let's hope that the atomic clock correction does not distort the timestamp monotonicity too much.
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+  // return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+  // Let's hope that the atomic clock correction does not distort the system_clock timestamp monotonicity too much.
 }
 
 /*******************************/

@@ -76,8 +76,8 @@ class PubHandler {
  public:
   using PointCloudsCallback = std::function<void(PointFrame*, void *)>;
   using ImuDataCallback = std::function<void(ImuData*, void*)>;
-  // using TimePoint = std::chrono::high_resolution_clock::time_point;
-  using TimePoint = std::chrono::system_clock::time_point;
+  using TimePoint = std::chrono::high_resolution_clock::time_point;
+  // using TimePoint = std::chrono::system_clock::time_point;
 
   PubHandler() {}
 
