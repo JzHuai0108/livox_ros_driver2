@@ -132,6 +132,7 @@ void Lds::StorageLvxPointData(PointFrame* frame) {
     PointPacket& lidar_point = frame->lidar_point[i];
 
     uint64_t base_time = frame->base_time[i];
+    uint64_t host_time = frame->host_time[i];
     uint8_t index = 0;
     int8_t ret = cache_index_.LvxGetIndex(lidar_point.lidar_type, lidar_point.handle, index);
     if (ret != 0) {
@@ -141,7 +142,7 @@ void Lds::StorageLvxPointData(PointFrame* frame) {
 
     lidars_[index].connect_state = kConnectStateSampling;
 
-    PushLidarData(&lidar_point, index, base_time);
+    PushLidarData(&lidar_point, index, base_time, host_time);
   }
 }
 
@@ -156,6 +157,7 @@ void Lds::StoragePointData(PointFrame* frame) {
     //printf("StoragePointData, lidar_type:%u, point_num:%lu.\n", lidar_point.lidar_type, lidar_point.points_num);
 
     uint64_t base_time = frame->base_time[i];
+    uint64_t host_time = frame->host_time[i];
 
     uint8_t index = 0;
     int8_t ret = cache_index_.GetIndex(lidar_point.lidar_type, lidar_point.handle, index);
@@ -163,11 +165,11 @@ void Lds::StoragePointData(PointFrame* frame) {
       printf("Storage point data failed, lidar type:%u, handle:%u.\n", lidar_point.lidar_type, lidar_point.handle);
       continue;
     }
-    PushLidarData(&lidar_point, index, base_time);
+    PushLidarData(&lidar_point, index, base_time, host_time);
   }
 }
 
-void Lds::PushLidarData(PointPacket* lidar_data, const uint8_t index, const uint64_t base_time) {
+void Lds::PushLidarData(PointPacket* lidar_data, const uint8_t index, const uint64_t base_time, const uint64_t host_time) {
   if (lidar_data == nullptr) {
     return;
   }
@@ -182,7 +184,7 @@ void Lds::PushLidarData(PointPacket* lidar_data, const uint8_t index, const uint
   }
 
   if (!QueueIsFull(queue)) {
-    QueuePushAny(queue, (uint8_t *)lidar_data, base_time);
+    QueuePushAny(queue, (uint8_t *)lidar_data, base_time, host_time);
     if (!QueueIsEmpty(queue)) {
       if (pcd_semaphore_.GetCount() <= 0) {
         pcd_semaphore_.Signal();

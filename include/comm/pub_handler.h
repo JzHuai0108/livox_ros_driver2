@@ -53,6 +53,7 @@ class LidarPubHandler {
   uint64_t GetRecentTimeStamp();
   uint32_t GetLidarPointCloudsSize();
   uint64_t GetLidarBaseTime();
+  uint64_t GetLidarHostBaseTime();
 
  private:
   void LivoxLidarPointCloudProcess(RawPacket & pkt);
@@ -107,7 +108,7 @@ class PubHandler {
                                              LivoxLidarEthernetPacket *data, void *client_data);
   
   static bool GetLidarId(LidarProtoType lidar_type, uint32_t handle, uint32_t& id);
-  static uint64_t GetEthPacketTimestamp(uint8_t timestamp_type, uint8_t* time_stamp, uint8_t size);
+  static std::pair<uint64_t, uint64_t> GetEthPacketTimestamp(uint8_t timestamp_type, uint8_t* time_stamp, uint8_t size);
 
   PointCloudsCallback points_callback_;
   void* pub_client_data_ = nullptr;

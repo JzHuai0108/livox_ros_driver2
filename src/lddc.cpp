@@ -210,7 +210,7 @@ void Lddc::PublishPointcloud2(LidarDataQueue *queue, uint8_t index) {
     PointCloud2 cloud;
     uint64_t timestamp = 0;
     InitPointcloud2Msg(pkg, cloud, timestamp);
-    PublishPointcloud2Data(index, timestamp, cloud);
+    PublishPointcloud2Data(index, pkg.host_time, cloud);
   }
 }
 
@@ -226,7 +226,7 @@ void Lddc::PublishCustomPointcloud(LidarDataQueue *queue, uint8_t index) {
     CustomMsg livox_msg;
     InitCustomMsg(livox_msg, pkg, index);
     FillPointsToCustomMsg(livox_msg, pkg);
-    PublishCustomPointData(livox_msg, index);
+    PublishCustomPointData(livox_msg, index, pkg.host_time);
   }
 }
 
@@ -315,6 +315,7 @@ void Lddc::InitPointcloud2Msg(const StoragePacket& pkg, PointCloud2& cloud, uint
   #elif defined BUILDING_ROS2
       cloud.header.stamp = rclcpp::Time(timestamp);
   #endif
+  timestamp = pkg.host_time;
 
   std::vector<LivoxPointXyzrtlt> points;
   for (size_t i = 0; i < pkg.points_num; ++i) {
@@ -398,7 +399,7 @@ void Lddc::FillPointsToCustomMsg(CustomMsg& livox_msg, const StoragePacket& pkg)
   }
 }
 
-void Lddc::PublishCustomPointData(const CustomMsg& livox_msg, const uint8_t index) {
+void Lddc::PublishCustomPointData(const CustomMsg& livox_msg, const uint8_t index, uint64_t host_time) {
 #ifdef BUILDING_ROS1
   PublisherPtr publisher_ptr = Lddc::GetCurrentPublisher(index);
 #elif defined BUILDING_ROS2
@@ -410,7 +411,7 @@ void Lddc::PublishCustomPointData(const CustomMsg& livox_msg, const uint8_t inde
   } else {
 #ifdef BUILDING_ROS1
     if (bag_ && enable_lidar_bag_) {
-      bag_->write(publisher_ptr->getTopic(), ros::Time(livox_msg.timebase / ksec2nano, livox_msg.timebase % ksec2nano), livox_msg);
+      bag_->write(publisher_ptr->getTopic(), ros::Time(host_time / ksec2nano, host_time % ksec2nano), livox_msg);
     }
 #endif
   }
@@ -517,7 +518,8 @@ void Lddc::PublishImuData(LidarImuDataQueue& imu_data_queue, const uint8_t index
   } else {
 #ifdef BUILDING_ROS1
     if (bag_ && enable_imu_bag_) {
-      bag_->write(publisher_ptr->getTopic(), ros::Time(timestamp / ksec2nano, timestamp % ksec2nano), imu_msg);
+      uint64_t host_time = imu_data.host_stamp;
+      bag_->write(publisher_ptr->getTopic(), ros::Time(host_time / ksec2nano, host_time % ksec2nano), imu_msg);
     }
 #endif
   }

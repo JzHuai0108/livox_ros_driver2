@@ -165,6 +165,7 @@ typedef struct {
   uint8_t tag;
   uint8_t line;
   uint64_t offset_time;
+  uint64_t host_time;
 } PointXyzlt;
 
 typedef struct {
@@ -176,6 +177,7 @@ typedef struct {
 
 typedef struct {
   uint64_t base_time[kMaxSourceLidar] {};
+  uint64_t host_time[kMaxSourceLidar] {};
   uint8_t lidar_num {};
   PointPacket lidar_point[kMaxSourceLidar] {};
 } PointFrame;
@@ -186,6 +188,7 @@ typedef struct {
   LidarProtoType lidar_type;
   uint32_t handle;
   uint64_t base_time;
+  uint64_t host_time;
   uint32_t points_num;
   std::vector<PointXyzlt> points;
 } StoragePacket;
@@ -198,6 +201,7 @@ typedef struct {
   uint8_t data_type;
   uint8_t line_num;
   uint64_t time_stamp;
+  uint64_t host_stamp;
   uint64_t point_interval;
   std::vector<uint8_t> raw_data;
 } RawPacket;

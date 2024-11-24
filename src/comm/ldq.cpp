@@ -133,10 +133,11 @@ bool QueueIsEmpty(LidarDataQueue *queue) {
   return (queue->rd_idx == queue->wr_idx);
 }
 
-uint32_t QueuePushAny(LidarDataQueue *queue, uint8_t *data, const uint64_t base_time) {
+uint32_t QueuePushAny(LidarDataQueue *queue, uint8_t *data, const uint64_t base_time, const uint64_t host_time) {
   uint32_t wr_idx = queue->wr_idx & queue->mask;
   PointPacket* lidar_point_data = reinterpret_cast<PointPacket*>(data);
   queue->storage_packet[wr_idx].base_time = base_time;
+  queue->storage_packet[wr_idx].host_time = host_time;
   queue->storage_packet[wr_idx].points_num = lidar_point_data->points_num;
 
   queue->storage_packet[wr_idx].points.clear();
