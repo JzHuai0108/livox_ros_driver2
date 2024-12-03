@@ -5,9 +5,25 @@ readonly VERSION_ROS2="ROS2"
 readonly VERSION_HUMBLE="humble"
 
 if [ $# -lt 2 ]; then
-    echo "Usage: $0 [ROS1|ROS2|humble] [Livox-SDK2 install prefix]"
+    echo "Usage: $0 [ROS1|ROS2|humble] [Livox-SDK2 install prefix] [extra cmake_prefix_path]"
+    echo "eg: $0 ROS1 $HOME/Documents/slam_devel $HOME/Documents/slam_devel"
+    echo "/opt/ros/noetic is often not need to pass in the prefix_path argument."
     exit
 fi
+
+if [ $# -ge 3 ]; then
+    prefix_path="$CMAKE_PREFIX_PATH;$3"
+else
+    prefix_path=$CMAKE_PREFIX_PATH
+fi
+echo "prefix path: $prefix_path"
+
+if [ $# -ge 2 ]; then
+    install_prefix="$2"
+else
+    install_prefix=$CMAKE_INSTALL_PREFIX
+fi
+echo "install prefix: $install_prefix"
 
 pushd `pwd` > /dev/null
 cd `dirname $0`
@@ -60,7 +76,9 @@ fi
 pushd `pwd` > /dev/null
 if [ $ROS_VERSION = ${VERSION_ROS1} ]; then
     cd ../../
-    catkin build -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX="$2"
+    cmd="catkin build -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX="$install_prefix" -DCMAKE_PREFIX_PATH="$prefix_path""
+    echo $cmd
+    $cmd
 elif [ $ROS_VERSION = ${VERSION_ROS2} ]; then
     cd ../../
     colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DHUMBLE_ROS=${ROS_HUMBLE}

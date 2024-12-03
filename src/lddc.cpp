@@ -427,6 +427,7 @@ void Lddc::InitPclMsg(const StoragePacket& pkg, PointCloud& cloud, uint64_t& tim
     timestamp = pkg.base_time;
   }
   cloud.header.stamp = timestamp / 1000.0;  // to pcl ros time stamp
+  timestamp = pkg.host_time;
 #elif defined BUILDING_ROS2
   std::cout << "warning: pcl::PointCloud is not supported in ROS2, "
             << "please check code logic" 
