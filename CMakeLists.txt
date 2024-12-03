@@ -50,6 +50,11 @@ if(ROS_EDITION STREQUAL "ROS1")
   #   Message2.msg
   )
 
+  add_service_files(
+    FILES
+    StartStop.srv
+  )
+
   ## Generate added messages and services with any dependencies listed here
   generate_messages(DEPENDENCIES
     std_msgs
@@ -176,7 +181,11 @@ if(ROS_EDITION STREQUAL "ROS1")
   )
   target_link_libraries(${PROJECT_NAME}_node
     ${PROJECT_NAME})
-
+  add_executable(recording_controller
+    src/recording_controller.cpp
+  )
+  target_link_libraries(recording_controller
+    ${PROJECT_NAME})
   add_executable(test_time src/test_time.cpp)
 
   #---------------------------------------------------------------------------------------

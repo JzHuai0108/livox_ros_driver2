@@ -31,6 +31,7 @@
 #include "lds.h"
 #include "lddc_top.h"
 #include <pcl_ros/point_cloud.h>
+#include <mutex>
 
 namespace livox_ros {
 
@@ -53,6 +54,7 @@ class Lddc final {
   void DistributePointCloudData(void);
   void DistributeImuData(void);
   void CreateBagFile(const std::string &file_name);
+  void CloseBagFile();
   void PrepareExit(void);
 
   uint8_t GetTransferFormat(void) { return transfer_format_; }
@@ -118,6 +120,8 @@ class Lddc final {
   PublisherPtr private_imu_pub_[kMaxSourceLidar];
   PublisherPtr global_imu_pub_;
   rosbag::Bag *bag_;
+  std::mutex bag_mutex;
+
 #elif defined BUILDING_ROS2
   PublisherPtr private_pub_[kMaxSourceLidar];
   PublisherPtr global_pub_;

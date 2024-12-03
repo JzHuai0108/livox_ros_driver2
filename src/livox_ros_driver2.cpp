@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
   int xfer_format = kPointCloud2Msg;
   int multi_topic = 0;
   int data_src = kSourceRawLidar;
-  int output_type      = kOutputToRos;
+  int output_type      = kOutputToRos | kOutputToRosBagFile;
   double publish_freq  = 10.0; /* Hz */
   std::string frame_id = "livox_frame";
   bool lidar_bag = true;
@@ -97,7 +97,9 @@ int main(int argc, char **argv) {
 
   livox_node.pointclouddata_poll_thread_ = std::make_shared<std::thread>(&DriverNode::PointCloudDataPollThread, &livox_node);
   livox_node.imudata_poll_thread_ = std::make_shared<std::thread>(&DriverNode::ImuDataPollThread, &livox_node);
-  while (ros::ok()) { usleep(10000); }
+  while (ros::ok()) { usleep(10000);
+    ros::spinOnce(); // so that the recording service can be called.
+  }
 
   return 0;
 }
