@@ -185,11 +185,14 @@ void Lddc::PollingLidarImuData(uint8_t index, LidarDevice *lidar) {
 
 void Lddc::PrepareExit(void) {
 #ifdef BUILDING_ROS1
-  if (bag_) {
-    DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
-    bag_->close();
-    DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
-    bag_ = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(bag_mutex);
+    if (bag_) {
+      DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
+      bag_->close();
+      DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
+      bag_ = nullptr;
+    }
   }
 #endif
   if (lds_) {
@@ -341,10 +344,12 @@ void Lddc::PublishPointcloud2Data(const uint8_t index, const uint64_t timestamp,
     std::dynamic_pointer_cast<Publisher<PointCloud2>>(GetCurrentPublisher(index));
 #endif
 
-  if (kOutputToRos == output_type_) {
+  if (kOutputToRos & output_type_) {
     publisher_ptr->publish(cloud);
-  } else {
+  }
+  if (kOutputToRosBagFile & output_type_) {
 #ifdef BUILDING_ROS1
+    std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
       bag_->write(publisher_ptr->getTopic(), ros::Time(timestamp / ksec2nano, timestamp % ksec2nano), cloud);
     }
@@ -406,10 +411,12 @@ void Lddc::PublishCustomPointData(const CustomMsg& livox_msg, const uint8_t inde
   Publisher<CustomMsg>::SharedPtr publisher_ptr = std::dynamic_pointer_cast<Publisher<CustomMsg>>(GetCurrentPublisher(index));
 #endif
 
-  if (kOutputToRos == output_type_) {
+  if (kOutputToRos & output_type_) {
     publisher_ptr->publish(livox_msg);
-  } else {
+  }
+  if (kOutputToRosBagFile & output_type_) {
 #ifdef BUILDING_ROS1
+    std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
       bag_->write(publisher_ptr->getTopic(), ros::Time(host_time / ksec2nano, host_time % ksec2nano), livox_msg);
     }
@@ -464,9 +471,11 @@ void Lddc::FillPointsToPclMsg(const StoragePacket& pkg, PointCloud& pcl_msg) {
 void Lddc::PublishPclData(const uint8_t index, const uint64_t timestamp, const PointCloud& cloud) {
 #ifdef BUILDING_ROS1
   PublisherPtr publisher_ptr = Lddc::GetCurrentPublisher(index);
-  if (kOutputToRos == output_type_) {
+  if (kOutputToRos & output_type_) {
     publisher_ptr->publish(cloud);
-  } else {
+  }
+  if (kOutputToRosBagFile & output_type_) {
+    std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
       bag_->write(publisher_ptr->getTopic(), ros::Time(timestamp / ksec2nano, timestamp % ksec2nano), cloud);
     }
@@ -514,10 +523,12 @@ void Lddc::PublishImuData(LidarImuDataQueue& imu_data_queue, const uint8_t index
   Publisher<ImuMsg>::SharedPtr publisher_ptr = std::dynamic_pointer_cast<Publisher<ImuMsg>>(GetCurrentImuPublisher(index));
 #endif
 
-  if (kOutputToRos == output_type_) {
+  if (kOutputToRos & output_type_) {
     publisher_ptr->publish(imu_msg);
-  } else {
+  }
+  if (kOutputToRosBagFile & output_type_) {
 #ifdef BUILDING_ROS1
+    std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_imu_bag_) {
       uint64_t host_time = imu_data.host_stamp;
       bag_->write(publisher_ptr->getTopic(), ros::Time(host_time / ksec2nano, host_time % ksec2nano), imu_msg);
@@ -695,6 +706,7 @@ std::shared_ptr<rclcpp::PublisherBase> Lddc::GetCurrentImuPublisher(uint8_t hand
 
 void Lddc::CreateBagFile(const std::string &file_name) {
 #ifdef BUILDING_ROS1
+  std::lock_guard<std::mutex> lock(bag_mutex);
   if (!bag_) {
     bag_ = new rosbag::Bag;
     bag_->open(file_name, rosbag::bagmode::Write);
@@ -703,4 +715,15 @@ void Lddc::CreateBagFile(const std::string &file_name) {
 #endif
 }
 
+void Lddc::CloseBagFile() {
+  #ifdef BUILDING_ROS1
+  std::lock_guard<std::mutex> lock(bag_mutex);
+  if (bag_) {
+    DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
+    bag_->close();
+    DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
+    bag_ = nullptr;
+  }
+#endif
+}
 }  // namespace livox_ros

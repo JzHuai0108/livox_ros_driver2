@@ -28,6 +28,44 @@
 
 namespace livox_ros {
 
+DriverNode::DriverNode() : ros::NodeHandle(), recording_(false) {
+    control_service_ = advertiseService("start_stop_recording",
+            &DriverNode::controlCallback, this);
+}
+
+bool DriverNode::controlCallback(livox_ros_driver2::StartStop::Request &req,
+                                livox_ros_driver2::StartStop::Response &res) {
+    if (req.start) {
+        if (recording_) {
+            res.success = false;
+            res.message = "Recording is already in progress.";
+            return true;
+        }
+        if (req.filename.empty()) {
+            res.success = false;
+            res.message = "Filename must be provided when starting recording.";
+            return true;
+        }
+        current_filename_ = req.filename;
+        recording_ = true;
+
+        lddc_ptr_->CreateBagFile(current_filename_); // Start recording
+        res.success = true;
+        res.message = "Started recording to: " + current_filename_;
+    } else {
+        if (!recording_) {
+            res.success = false;
+            res.message = "No recording is currently active.";
+            return true;
+        }
+        lddc_ptr_->CloseBagFile();
+        res.success = true;
+        res.message = "Stopped recording.";
+        recording_ = false;
+    }
+    return true;
+}
+
 DriverNode& DriverNode::GetNode() noexcept {
   return *this;
 }
@@ -62,6 +100,16 @@ void DriverNode::registerLds(double publish_freq, const std::string &user_config
   }
 }
 
+void DriverNode::StartRecording(const std::string &bagname) {
+  lddc_ptr_->CreateBagFile(bagname); // Start recording
+  current_filename_ = bagname;
+  recording_ = true;
+}
+
+void DriverNode::StopRecording() {
+  lddc_ptr_->CloseBagFile();
+  recording_ = false;
+}
 
 void DriverNode::PointCloudDataPollThread()
 {

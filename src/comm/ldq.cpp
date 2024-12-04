@@ -97,6 +97,7 @@ bool QueuePrePop(LidarDataQueue *queue, StoragePacket *storage_packet) {
   uint32_t rd_idx = queue->rd_idx & queue->mask;
 
   storage_packet->base_time = queue->storage_packet[rd_idx].base_time;
+  storage_packet->host_time = queue->storage_packet[rd_idx].host_time;
   storage_packet->points_num = queue->storage_packet[rd_idx].points_num;
   storage_packet->points.resize(queue->storage_packet[rd_idx].points_num);
 

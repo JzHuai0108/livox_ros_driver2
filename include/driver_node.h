@@ -34,25 +34,32 @@ class Lddc;
 #ifdef BUILDING_ROS1
 class DriverNode final : public ros::NodeHandle {
  public:
-  DriverNode() = default;
+  DriverNode();
   DriverNode(const DriverNode &) = delete;
   ~DriverNode();
   DriverNode &operator=(const DriverNode &) = delete;
 
   DriverNode& GetNode() noexcept;
-
+  bool controlCallback(livox_ros_driver2::StartStop::Request &req,
+                       livox_ros_driver2::StartStop::Response &res);
   void PointCloudDataPollThread();
   void ImuDataPollThread();
   void setFuture();
   void setLddc(int xfer_format, int multi_topic, int data_src, int output_type,
       double publish_freq, std::string frame_id, bool lidar_bag, bool imu_bag);
   void registerLds(double publish_freq, const std::string &user_config_path);
+  void StartRecording(const std::string &bagname);
+  void StopRecording();
 
   std::shared_ptr<Lddc> lddc_ptr_;
   std::shared_ptr<std::thread> pointclouddata_poll_thread_;
   std::shared_ptr<std::thread> imudata_poll_thread_;
   std::shared_future<void> future_;
   std::promise<void> exit_signal_;
+
+  ros::ServiceServer control_service_;
+  bool recording_;
+  std::string current_filename_;
 };
 
 #elif defined BUILDING_ROS2
