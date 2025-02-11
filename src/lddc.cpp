@@ -350,9 +350,13 @@ void Lddc::PublishPointcloud2Data(const uint8_t index, const uint64_t timestamp,
   if (kOutputToRosBagFile & output_type_) {
 #ifdef BUILDING_ROS1
     std::lock_guard<std::mutex> lock(bag_mutex);
+    auto tic = std::chrono::system_clock::now();
     if (bag_ && enable_lidar_bag_) {
       bag_->write(publisher_ptr->getTopic(), ros::Time(timestamp / ksec2nano, timestamp % ksec2nano), cloud);
     }
+    auto toc = std::chrono::system_clock::now();
+    const auto elapsed_ms = std::chrono::duration<double, std::milli>(toc - tic).count();
+    DRIVER_INFO(*cur_node_, "Saving lidar pc2 used %.3f ms!", elapsed_ms);
 #endif
   }
 }
@@ -529,10 +533,14 @@ void Lddc::PublishImuData(LidarImuDataQueue& imu_data_queue, const uint8_t index
   if (kOutputToRosBagFile & output_type_) {
 #ifdef BUILDING_ROS1
     std::lock_guard<std::mutex> lock(bag_mutex);
+    auto tic = std::chrono::system_clock::now();
     if (bag_ && enable_imu_bag_) {
       uint64_t host_time = imu_data.host_stamp;
       bag_->write(publisher_ptr->getTopic(), ros::Time(host_time / ksec2nano, host_time % ksec2nano), imu_msg);
     }
+    auto toc = std::chrono::system_clock::now();
+    const auto elapsed_ms = std::chrono::duration<double, std::milli>(toc - tic).count();
+    DRIVER_INFO(*cur_node_, "Saving lidar IMU used %.3f ms!", elapsed_ms);
 #endif
   }
 }
