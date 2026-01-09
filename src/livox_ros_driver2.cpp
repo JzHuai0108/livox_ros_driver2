@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
   livox_node.setLddc(xfer_format, multi_topic, data_src, output_type,
                         publish_freq, frame_id, lidar_bag, imu_bag);
- 
+
   if (data_src == kSourceRawLidar) {
     DRIVER_INFO(livox_node, "Data Source is raw lidar.");
 
@@ -105,6 +105,9 @@ int main(int argc, char **argv) {
 }
 
 #elif defined BUILDING_ROS2
+#include "lddc.h"
+#include "lds_lidar.h"
+
 namespace livox_ros
 {
 DriverNode::DriverNode(const rclcpp::NodeOptions & node_options)

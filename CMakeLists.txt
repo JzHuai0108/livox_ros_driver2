@@ -1,4 +1,4 @@
-# judge which cmake codes to use 
+# judge which cmake codes to use
 if(ROS_EDITION STREQUAL "ROS1")
 
   # Copyright(c) 2019 livoxtech limited.
@@ -192,7 +192,7 @@ if(ROS_EDITION STREQUAL "ROS1")
   # Install
   #---------------------------------------------------------------------------------------
 
-  install(TARGETS 
+  install(TARGETS
     ${PROJECT_NAME}
     ${PROJECT_NAME}_node
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -274,12 +274,10 @@ else(ROS_EDITION STREQUAL "ROS2")
   )
 
   ## make sure the livox_lidar_sdk_shared library is installed
-  find_library(LIVOX_LIDAR_SDK_LIBRARY liblivox_lidar_sdk_shared.so /usr/local/lib REQUIRED)
+  set(LIVOX_LIDAR_SDK_LIBRARY /home/unitree/ros_workspaces/mid360_ws/install/livox_sdk2/lib/liblivox_lidar_sdk_shared.so)
 
   ##
-  find_path(LIVOX_LIDAR_SDK_INCLUDE_DIR
-    NAMES "livox_lidar_api.h" "livox_lidar_def.h"
-    REQUIRED)
+  set(LIVOX_LIDAR_SDK_INCLUDE_DIR /home/unitree/ros_workspaces/mid360_ws/install/livox_sdk2/include)
 
   ## PCL library
   link_directories(${PCL_LIBRARY_DIRS})

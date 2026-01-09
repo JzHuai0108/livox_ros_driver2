@@ -27,7 +27,7 @@
 #include "lds_lidar.h"
 
 namespace livox_ros {
-
+#ifdef BUILDING_ROS1
 DriverNode::DriverNode() : ros::NodeHandle(), recording_(false) {
     control_service_ = advertiseService("start_stop_recording",
             &DriverNode::controlCallback, this);
@@ -65,6 +65,7 @@ bool DriverNode::controlCallback(livox_ros_driver2::StartStop::Request &req,
     }
     return true;
 }
+#endif
 
 DriverNode& DriverNode::GetNode() noexcept {
   return *this;
@@ -77,6 +78,7 @@ DriverNode::~DriverNode() {
   imudata_poll_thread_->join();
 }
 
+#ifdef BUILDING_ROS1
 void DriverNode::setFuture() {
   future_ = exit_signal_.get_future();
 }
@@ -110,6 +112,7 @@ void DriverNode::StopRecording() {
   lddc_ptr_->CloseBagFile();
   recording_ = false;
 }
+#endif
 
 void DriverNode::PointCloudDataPollThread()
 {

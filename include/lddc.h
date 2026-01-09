@@ -30,7 +30,9 @@
 // #include "driver_node.h"
 #include "lds.h"
 #include "lddc_top.h"
+#ifdef BUILDING_ROS1
 #include <pcl_ros/point_cloud.h>
+#endif
 #include <mutex>
 
 namespace livox_ros {
