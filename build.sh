@@ -76,7 +76,7 @@ fi
 pushd `pwd` > /dev/null
 if [ $ROS_VERSION = ${VERSION_ROS1} ]; then
     cd ../../
-    cmd="catkin build -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX="$install_prefix" -DCMAKE_PREFIX_PATH="$prefix_path""
+    cmd="catkin build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DROS_EDITION=${VERSION_ROS1} -DCMAKE_INSTALL_PREFIX="$install_prefix""
     echo $cmd
     $cmd
 elif [ $ROS_VERSION = ${VERSION_ROS2} ]; then

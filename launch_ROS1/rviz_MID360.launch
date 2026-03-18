@@ -39,8 +39,8 @@
     </group>
 
 	<group if="$(arg rosbag_enable)">
-    	<node pkg="rosbag" type="record" name="record" output="screen"
-          		args="record -O $(arg output_bag) /livox/imu /livox/lidar"/>
-    </group>
+		<node pkg="rosbag" type="record" name="record" output="screen"
+			args="-O $(arg output_bag) /livox/imu /livox/lidar"/>
+	</group>
 
 </launch>
