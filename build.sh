@@ -3,6 +3,7 @@
 readonly VERSION_ROS1="ROS1"
 readonly VERSION_ROS2="ROS2"
 readonly VERSION_HUMBLE="humble"
+readonly VERSION_JAZZY="jazzy"
 
 if [ $# -lt 2 ]; then
     echo "Usage: $0 [ROS1|ROS2|humble] [Livox-SDK2 install prefix] [extra cmake_prefix_path]"
@@ -30,14 +31,17 @@ cd `dirname $0`
 echo "Working Path: "`pwd`
 
 ROS_VERSION=""
-ROS_HUMBLE=""
+ROS_DISTRO=""
 
 # Set working ROS version
 if [ "$1" = "ROS2" ]; then
     ROS_VERSION=${VERSION_ROS2}
 elif [ "$1" = "humble" ]; then
     ROS_VERSION=${VERSION_ROS2}
-    ROS_HUMBLE=${VERSION_HUMBLE}
+    ROS_DISTRO=${VERSION_HUMBLE}
+elif [ "$1" = "jazzy" ]; then
+    ROS_VERSION=${VERSION_ROS2}
+    ROS_DISTRO=${VERSION_JAZZY}
 elif [ "$1" = "ROS1" ]; then
     ROS_VERSION=${VERSION_ROS1}
 else
@@ -81,7 +85,7 @@ if [ $ROS_VERSION = ${VERSION_ROS1} ]; then
     $cmd
 elif [ $ROS_VERSION = ${VERSION_ROS2} ]; then
     cd ../../
-    colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DHUMBLE_ROS=${ROS_HUMBLE} -DCMAKE_INSTALL_PREFIX="$install_prefix"
+    colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DDISTRO_ROS=${ROS_DISTRO}
 fi
 popd > /dev/null
 

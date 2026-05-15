@@ -24,6 +24,7 @@
 
 #include "call_back/livox_lidar_callback.h"
 
+#include "livox_lidar_api.h"
 #include <string>
 #include <thread>
 #include <iostream>
