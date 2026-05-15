@@ -85,7 +85,7 @@ if [ $ROS_VERSION = ${VERSION_ROS1} ]; then
     $cmd
 elif [ $ROS_VERSION = ${VERSION_ROS2} ]; then
     cd ../../
-    colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DDISTRO_ROS=${ROS_DISTRO}
+    colcon build --cmake-args -DROS_EDITION=${VERSION_ROS2} -DDISTRO_ROS=${ROS_DISTRO} -DLIVOX_LIDAR_SDK_LIBRARY=$install_prefix/lib/liblivox_lidar_sdk_shared.so -DLIVOX_LIDAR_SDK_INCLUDE_DIR=$install_prefix/include
 fi
 popd > /dev/null
 

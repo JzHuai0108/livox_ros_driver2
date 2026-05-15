@@ -273,12 +273,6 @@ else(ROS_EDITION STREQUAL "ROS2")
     LIBRARY_NAME ${PROJECT_NAME}
   )
 
-  ## make sure the livox_lidar_sdk_shared library is installed
-  set(LIVOX_LIDAR_SDK_LIBRARY /home/unitree/ros_workspaces/mid360_ws/install/livox_sdk2/lib/liblivox_lidar_sdk_shared.so)
-
-  ##
-  set(LIVOX_LIDAR_SDK_INCLUDE_DIR /home/unitree/ros_workspaces/mid360_ws/install/livox_sdk2/include)
-
   ## PCL library
   link_directories(${PCL_LIBRARY_DIRS})
   add_definitions(${PCL_DEFINITIONS})
