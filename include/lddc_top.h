@@ -33,8 +33,8 @@ namespace livox_ros {
 
 /** Send pointcloud message Data to ros subscriber or save them in rosbag file */
 typedef enum {
-  kOutputToRos = 1 << 0,
-  kOutputToRosBagFile = 1 << 1,
+  kOutputToRos = 0,
+  kOutputToRosBagFile = 1,
 } DestinationOfMessageOutput;
 
 /** The message type of transfer */

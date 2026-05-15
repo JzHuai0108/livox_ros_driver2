@@ -344,10 +344,10 @@ void Lddc::PublishPointcloud2Data(const uint8_t index, const uint64_t timestamp,
     std::dynamic_pointer_cast<Publisher<PointCloud2>>(GetCurrentPublisher(index));
 #endif
 
-  if (kOutputToRos & output_type_) {
+  if (kOutputToRos == output_type_) {
     publisher_ptr->publish(cloud);
   }
-  if (kOutputToRosBagFile & output_type_) {
+  if (kOutputToRosBagFile == output_type_) {
 #ifdef BUILDING_ROS1
     std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
@@ -411,10 +411,10 @@ void Lddc::PublishCustomPointData(const CustomMsg& livox_msg, const uint8_t inde
   Publisher<CustomMsg>::SharedPtr publisher_ptr = std::dynamic_pointer_cast<Publisher<CustomMsg>>(GetCurrentPublisher(index));
 #endif
 
-  if (kOutputToRos & output_type_) {
+  if (kOutputToRos == output_type_) {
     publisher_ptr->publish(livox_msg);
   }
-  if (kOutputToRosBagFile & output_type_) {
+  if (kOutputToRosBagFile == output_type_) {
 #ifdef BUILDING_ROS1
     std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
@@ -471,10 +471,10 @@ void Lddc::FillPointsToPclMsg(const StoragePacket& pkg, PointCloud& pcl_msg) {
 void Lddc::PublishPclData(const uint8_t index, const uint64_t timestamp, const PointCloud& cloud) {
 #ifdef BUILDING_ROS1
   PublisherPtr publisher_ptr = Lddc::GetCurrentPublisher(index);
-  if (kOutputToRos & output_type_) {
+  if (kOutputToRos == output_type_) {
     publisher_ptr->publish(cloud);
   }
-  if (kOutputToRosBagFile & output_type_) {
+  if (kOutputToRosBagFile == output_type_) {
     std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_lidar_bag_) {
       bag_->write(publisher_ptr->getTopic(), ros::Time(timestamp / ksec2nano, timestamp % ksec2nano), cloud);
@@ -523,10 +523,10 @@ void Lddc::PublishImuData(LidarImuDataQueue& imu_data_queue, const uint8_t index
   Publisher<ImuMsg>::SharedPtr publisher_ptr = std::dynamic_pointer_cast<Publisher<ImuMsg>>(GetCurrentImuPublisher(index));
 #endif
 
-  if (kOutputToRos & output_type_) {
+  if (kOutputToRos == output_type_) {
     publisher_ptr->publish(imu_msg);
   }
-  if (kOutputToRosBagFile & output_type_) {
+  if (kOutputToRosBagFile == output_type_) {
 #ifdef BUILDING_ROS1
     std::lock_guard<std::mutex> lock(bag_mutex);
     if (bag_ && enable_imu_bag_) {
