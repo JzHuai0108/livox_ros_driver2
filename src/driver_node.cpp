@@ -71,10 +71,17 @@ DriverNode& DriverNode::GetNode() noexcept {
 }
 
 DriverNode::~DriverNode() {
-  lddc_ptr_->lds_->RequestExit();
+  StopRecording();
+  if (lddc_ptr_ && lddc_ptr_->lds_) {
+    lddc_ptr_->lds_->RequestExit();
+  }
   exit_signal_.set_value();
-  pointclouddata_poll_thread_->join();
-  imudata_poll_thread_->join();
+  if (pointclouddata_poll_thread_ && pointclouddata_poll_thread_->joinable()) {
+    pointclouddata_poll_thread_->join();
+  }
+  if (imudata_poll_thread_ && imudata_poll_thread_->joinable()) {
+    imudata_poll_thread_->join();
+  }
 }
 
 void DriverNode::setFuture() {
@@ -100,6 +107,18 @@ void DriverNode::registerLds(double publish_freq, const std::string &user_config
   }
 }
 
+void DriverNode::StartRecording(const std::string &bagname) {
+  lddc_ptr_->CreateBagFile(bagname); // Start recording
+  current_filename_ = bagname;
+  recording_ = true;
+}
+
+void DriverNode::StopRecording() {
+  if (lddc_ptr_) {
+    lddc_ptr_->CloseBagFile();
+  }
+  recording_ = false;
+}
 
 void DriverNode::PointCloudDataPollThread()
 {
@@ -122,7 +141,6 @@ void DriverNode::ImuDataPollThread()
 }
 
 } // namespace livox_ros
-
 
 
 

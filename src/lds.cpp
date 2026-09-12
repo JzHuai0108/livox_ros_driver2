@@ -39,6 +39,7 @@ CacheIndex Lds::cache_index_;
 /* Member function --------------------------------------------------------- */
 Lds::Lds(const double publish_freq, const uint8_t data_src)
     : lidar_count_(kMaxSourceLidar),
+      lidars_{},
       pcd_semaphore_(0),
       imu_semaphore_(0),
       publish_freq_(publish_freq),
@@ -67,6 +68,9 @@ void Lds::SetLidarDataSrc(LidarDevice *lidar, uint8_t data_src) {
 }
 
 void Lds::ResetLds(uint8_t data_src) {
+  cache_index_.Reset();
+  pcd_semaphore_.Reset();
+  imu_semaphore_.Reset();
   lidar_count_ = kMaxSourceLidar;
   for (uint32_t i = 0; i < kMaxSourceLidar; i++) {
     ResetLidar(&lidars_[i], data_src);
@@ -74,7 +78,10 @@ void Lds::ResetLds(uint8_t data_src) {
 }
 
 void Lds::RequestExit() {
-  request_exit_ = true;
+  request_exit_.store(true);
+  // Wake distributor threads that may be blocked waiting for the next packet.
+  pcd_semaphore_.Signal();
+  imu_semaphore_.Signal();
 }
 
 bool Lds::IsAllQueueEmpty() {

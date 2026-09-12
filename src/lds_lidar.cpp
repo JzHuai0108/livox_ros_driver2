@@ -86,8 +86,13 @@ bool LdsLidar::InitLdsLidar(const std::string& path_name) {
     g_lds_ldiar = this;
   }
 
+  CleanRequestExit();
+  ResetLdsLidar();
+  pub_handler().Init();
+
   path_ = path_name;
   if (!InitLidars()) {
+    pub_handler().Uninit();
     return false;
   }
   SetLidarPubHandle();
@@ -202,9 +207,13 @@ int LdsLidar::DeInitLdsLidar(void) {
   }
 
   if (lidar_summary_info_.lidar_type & kLivoxLidarType) {
+    pub_handler().Uninit();
     LivoxLidarSdkUninit();
     printf("Livox Lidar SDK Deinit completely!\n");
   }
+
+  is_initialized_ = false;
+  ResetLdsLidar();
 
   return 0;
 }

@@ -190,6 +190,7 @@ void Lddc::PrepareExit(void) {
     if (bag_) {
       DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
       bag_->close();
+      delete bag_;
       DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
       bag_ = nullptr;
     }
@@ -721,6 +722,7 @@ void Lddc::CloseBagFile() {
   if (bag_) {
     DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
     bag_->close();
+    delete bag_;
     DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
     bag_ = nullptr;
   }
