@@ -39,6 +39,20 @@ PubHandler &pub_handler() {
 }
 
 void PubHandler::Init() {
+  Uninit();
+  {
+    std::lock_guard<std::mutex> lock(packet_mutex_);
+    raw_packet_queue_.clear();
+    lidar_process_handlers_.clear();
+    points_.clear();
+    lidar_extrinsics_.clear();
+    frame_.lidar_num = 0;
+  }
+  points_callback_ = PointCloudsCallback();
+  pub_client_data_ = nullptr;
+  imu_callback_ = ImuDataCallback();
+  imu_client_data_ = nullptr;
+  is_quit_.store(false);
 }
 
 void PubHandler::Uninit() {
@@ -52,14 +66,13 @@ void PubHandler::Uninit() {
   if (point_process_thread_ &&
     point_process_thread_->joinable()) {
     point_process_thread_->join();
-    point_process_thread_ = nullptr;
-  } else {
-    /* */
   }
+  point_process_thread_ = nullptr;
 }
 
 void PubHandler::RequestExit() {
   is_quit_.store(true);
+  packet_condition_.notify_all();
 }
 
 void PubHandler::SetPointCloudConfig(const double publish_freq) {

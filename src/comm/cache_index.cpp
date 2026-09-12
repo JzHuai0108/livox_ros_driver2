@@ -118,4 +118,10 @@ void CacheIndex::ResetIndex(LidarDevice *lidar) {
   }
 }
 
+void CacheIndex::Reset() {
+  std::lock_guard<std::mutex> lock(index_mutex_);
+  map_index_.clear();
+  index_cache_.fill(false);
+}
+
 } // namespace

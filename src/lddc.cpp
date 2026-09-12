@@ -190,6 +190,7 @@ void Lddc::PrepareExit(void) {
     if (bag_) {
       DRIVER_INFO(*cur_node_, "Waiting to save the bag file!");
       bag_->close();
+      delete bag_;
       DRIVER_INFO(*cur_node_, "Save the bag file successfully!");
       bag_ = nullptr;
     }
@@ -344,6 +345,9 @@ void Lddc::PublishPointcloud2Data(const uint8_t index, const uint64_t timestamp,
     std::dynamic_pointer_cast<Publisher<PointCloud2>>(GetCurrentPublisher(index));
 #endif
 
+  if (kOutputToRos & output_type_) {
+    publisher_ptr->publish(cloud);
+  }
   if (kOutputToRos == output_type_) {
     publisher_ptr->publish(cloud);
   }

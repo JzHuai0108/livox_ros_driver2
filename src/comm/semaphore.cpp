@@ -38,4 +38,14 @@ void Semaphore::Wait() {
   --count_;
 }
 
+void Semaphore::Reset() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  count_ = 0;
+}
+
+int Semaphore::GetCount() {
+  std::lock_guard<std::mutex> lock(mutex_);
+  return count_;
+}
+
 } // namespace livox_ros

@@ -72,10 +72,17 @@ DriverNode& DriverNode::GetNode() noexcept {
 }
 
 DriverNode::~DriverNode() {
-  lddc_ptr_->lds_->RequestExit();
+  StopRecording();
+  if (lddc_ptr_ && lddc_ptr_->lds_) {
+    lddc_ptr_->lds_->RequestExit();
+  }
   exit_signal_.set_value();
-  pointclouddata_poll_thread_->join();
-  imudata_poll_thread_->join();
+  if (pointclouddata_poll_thread_ && pointclouddata_poll_thread_->joinable()) {
+    pointclouddata_poll_thread_->join();
+  }
+  if (imudata_poll_thread_ && imudata_poll_thread_->joinable()) {
+    imudata_poll_thread_->join();
+  }
 }
 
 #ifdef BUILDING_ROS1
@@ -109,7 +116,9 @@ void DriverNode::StartRecording(const std::string &bagname) {
 }
 
 void DriverNode::StopRecording() {
-  lddc_ptr_->CloseBagFile();
+  if (lddc_ptr_) {
+    lddc_ptr_->CloseBagFile();
+  }
   recording_ = false;
 }
 #endif
@@ -135,7 +144,6 @@ void DriverNode::ImuDataPollThread()
 }
 
 } // namespace livox_ros
-
 
 
 
